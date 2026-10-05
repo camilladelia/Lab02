@@ -1,23 +1,94 @@
 def carica_da_file(file_path):
     """Carica le foto dal file, creando un nuovo anno ogni volta che compare per la prima volta"""
-    # TODO
+    nuovo_album= []
 
+    try:
+        with open (file_path,"r", encoding= "utf-8") as file:
+            linee= file.readlines()
+            if not linee:
+                return nuovo_album
+            for linea in linee[1:]:
+                dati= linea.strip().split(",")
+                if len(dati)== 5:
+                    codice,titolo,autore,mese,anno = dati
+                    mese= int(mese)
+                    anno=int(anno)
+                    #Raggruppa in dizionario
+                    foto ={
+                        "codice" : codice,
+                        "titolo": titolo,
+                        "autore": autore,
+                        "mese": mese,
+                        "anno": anno
+                    }
+                    anno_presente= False
+                    for gruppo in nuovo_album:
+                        if gruppo [0]== anno:
+                            gruppo [1].append(foto)
+                            anno_presente= True
+                            break
+                    if not anno_presente:
+                        nuovo_album.append([anno, [foto]])
+        return nuovo_album
+    except FileNotFoundError:
+        return None
 
 def aggiungi_foto(album, codice, titolo, autore, mese, anno, file_path):
     """Aggiunge una foto all'album, creando l'anno al volo se non è ancora presente"""
-    # TODO
-
+    if mese< 1 or mese >12:
+        return None
+    for gruppo in album:
+        for f in gruppo [1]:
+            if f["codice"]== codice:
+                return None
+    try:
+        with open (file_path, "r", encoding= "utf-8") as file:
+            pass
+    except FileNotFoundError:
+        return None
+    nuova_foto={
+        "codice": codice,
+        "titolo": titolo,
+        "autore": autore,
+        "mese":mese,
+        "anno":anno
+    }
+    anno_presente= False
+    for gruppo in album:
+        if gruppo[0]== anno:
+            gruppo[1].append(nuova_foto)
+            anno_presente= True
+            break
+    if not anno_presente:
+        album.append([anno,[nuova_foto]])
+    with open (file_path, "a", encoding= "utf-8") as file:
+        file.write(f"\n{codice},{titolo},{autore},{mese},{anno}")
+    return nuova_foto
 
 def cerca_foto(album, codice):
     """Cerca una foto nell'album dato il codice"""
-    # TODO
+    for gruppo in album:
+        lista_foto_anno= gruppo[1]
+
+        for foto in lista_foto_anno:
+            if foto ["codice"]== codice:
+                risultato= f"{foto['codice']}{foto['titolo']}, {foto['autore']}, {foto['mese']}, {foto['anno']}"
+                return risultato
+    return None
 
 
 def elenco_foto_anno_per_titolo(album, anno):
     """Ordina i titoli delle foto di un dato anno in ordine alfabetico"""
-    # TODO
+    for gruppo in album:
+        if gruppo [0]== anno:
+            lista_foto_anno= gruppo [1]
+            titoli = []
+            for foto in lista_foto_anno:
+                titoli.append(foto["titolo"])
+            titoli.sort()
 
-
+            return titoli
+    return None
 def main():
     album = []
     file_path = "album_fotografico.csv"
